@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>School Planner</title>
+  <style>
+    :root {
+      --main:#2F80D8;
+      --main-soft:#EAF3FF;
+      --green:#2FAE55;
+      --orange:#E98200;
+      --red:#E6463A;
+      --bg:#F5F6F8;
+      --card:#FFFFFF;
+      --text:#303236;
+      --sub:#747980;
+      --line:#DDE2E8;
+      --shadow:0 6px 18px rgba(30,36,45,.07);
+      --radius:18px;
+    }
+
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    button,input,select,textarea { font:inherit; }
+
+    .app {
+      width:100%;
+      max-width:520px;
+      min-height:100vh;
+      margin:0 auto;
+      padding-bottom:calc(82px + env(safe-area-inset-bottom));
+      background:var(--bg);
+    }
+
+    header {
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:rgba(245,246,248,.96);
+      backdrop-filter:blur(14px);
+      padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .header-main {
+      display:grid;
+      grid-template-columns:44px 1fr 44px;
+      gap:8px;
+      align-items:center;
+    }
+
+    .icon-btn {
+      width:44px;
+      height:44px;
+      border:1px solid var(--line);
+      border-radius:15px;
+      background:#fff;
+      color:var(--main);
+      font-size:22px;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,.04);
+    }
+
+    h1 {
+      margin:0;
+      text-align:center;
+      font-size:20px;
+      font-weight:850;
+    }
+
+    .date {
+      text-align:center;
+      margin-top:2px;
+      color:var(--sub);
+      font-size:13px;
+    }
+
+    .jump-tabs {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .jump-tabs button {
+      min-height:42px;
+      border:1px solid var(--line);
+      border-radius:15px;
+      background:#fff;
+      color:var(--text);
+      font-size:13px;
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .jump-tabs button.active {
+      background:var(--main);
+      color:#fff;
+      border-color:var(--main);
+      box-shadow:0 6px 14px rgba(47,128,216,.18);
+    }
+
+    main { padding:14px; }
+
+    .block {
+      scroll-margin-top:132px;
+      margin-bottom:18px;
+    }
+
+    .block-title {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      margin:8px 2px 10px;
+    }
+
+    .block-title h2 {
+      margin:0;
+      font-size:20px;
+      font-weight:900;
+    }
+
+    .block-title span {
+      color:var(--sub);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .card {
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:14px;
+      margin-bottom:12px;
+      box-shadow:var(--shadow);
+    }
+
+    .card-title {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+      font-size:16px;
+      font-weight:850;
+    }
+
+    .tabs {
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:7px;
+      margin-bottom:12px;
+    }
+
+    .tab {
+      min-height:46px;
+      border:1px solid var(--line);
+      border-radius:15px;
+      background:#fff;
+      color:var(--text);
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .tab.active {
+      background:var(--main);
+      color:white;
+      border-color:var(--main);
+      box-shadow:0 6px 14px rgba(47,128,216,.20);
+    }
+
+    .lesson {
+      display:grid;
+      grid-template-columns:46px 1fr;
+      gap:10px;
+      min-height:62px;
+      padding:12px 0;
+      border-bottom:1px solid var(--line);
+      align-items:center;
+    }
+
+    .lesson:last-child { border-bottom:none; padding-bottom:0; }
+
+    .period {
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--main-soft);
+      color:var(--main);
+      font-size:13px;
+      font-weight:900;
+      display:grid;
+      place-items:center;
+    }
+
+    .subject {
+      font-size:16px;
+      font-weight:850;
+      overflow-wrap:anywhere;
+    }
+
+    .teacher,.room {
+      color:var(--sub);
+      font-size:13px;
+      margin-top:3px;
+    }
+
+    .segmented {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:6px;
+      background:#E9EDF2;
+      padding:5px;
+      border-radius:16px;
+      margin-bottom:12px;
+    }
+
+    .segmented button {
+      min-height:42px;
+      border:none;
+      border-radius:12px;
+      background:transparent;
+      color:var(--sub);
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .segmented button.active {
+      background:#fff;
+      color:var(--main);
+      box-shadow:0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .todo {
+      display:grid;
+      grid-template-columns:42px 1fr;
+      gap:10px;
+      min-height:70px;
+      padding:12px 0;
+      border-bottom:1px solid var(--line);
+      align-items:center;
+      cursor:pointer;
+      border-radius:12px;
+    }
+
+    .todo:last-child { border-bottom:none; padding-bottom:0; }
+    .todo:active { background:#F8FAFC; }
+    .todo.done { opacity:.48; }
+    .todo.done .todo-title { text-decoration:line-through; }
+
+    .todo input[type="checkbox"] {
+      width:28px;
+      height:28px;
+      justify-self:center;
+      accent-color:var(--main);
+      pointer-events:none;
+    }
+
+    .todo-title {
+      font-size:15.5px;
+      font-weight:850;
+    }
+
+    .todo-sub {
+      color:var(--sub);
+      font-size:13px;
+      margin-top:3px;
+    }
+
+    .badges {
+      display:flex;
+      gap:6px;
+      margin-top:7px;
+      flex-wrap:wrap;
+    }
+
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:850;
+      white-space:nowrap;
+    }
+
+    .high { background:#FFE7E4; color:var(--red); }
+    .mid { background:#FFF2DA; color:var(--orange); }
+    .low { background:#E8F8ED; color:var(--green); }
+    .type { background:var(--main-soft); color:var(--main); }
+
+    .form-grid { display:grid; gap:12px; }
+
+    label {
+      display:grid;
+      gap:6px;
+      font-size:13px;
+      font-weight:850;
+      color:var(--text);
+    }
+
+    input,select,textarea {
+      width:100%;
+      min-height:50px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      color:var(--text);
+      font-size:16px;
+    }
+
+    textarea { min-height:82px; resize:vertical; }
+
+    .primary-btn,.ghost-btn {
+      min-height:52px;
+      width:100%;
+      border-radius:16px;
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .primary-btn {
+      border:none;
+      background:var(--main);
+      color:white;
+      box-shadow:0 8px 18px rgba(47,128,216,.22);
+    }
+
+    .ghost-btn {
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+    }
+
+    .week-calendar {
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:7px;
+      text-align:center;
+    }
+
+    .day {
+      min-height:62px;
+      padding:7px 2px;
+      border-radius:14px;
+      background:#FAFAFA;
+      border:1px solid var(--line);
+      font-size:12px;
+    }
+
+    .day.today {
+      background:var(--main);
+      color:white;
+      font-weight:850;
+    }
+
+    .dotline {
+      margin-top:4px;
+      font-size:12px;
+      color:var(--orange);
+      min-height:16px;
+    }
+
+    .tool-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .tool-card {
+      min-height:92px;
+      border-radius:var(--radius);
+      padding:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      text-align:left;
+    }
+
+    .tool-icon { font-size:24px; margin-bottom:6px; }
+    .tool-title { font-weight:850; font-size:15px; }
+    .tool-desc { margin-top:2px; font-size:12px; color:var(--sub); }
+
+    .empty {
+      color:var(--sub);
+      font-size:14px;
+      padding:12px 0;
+    }
+
+    .notice {
+      background:#F9FBFE;
+      border:1px dashed var(--line);
+      border-radius:14px;
+      padding:12px;
+      color:var(--sub);
+      font-size:14px;
+    }
+
+    .bottom-nav {
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      max-width:520px;
+      height:calc(76px + env(safe-area-inset-bottom));
+      margin:0 auto;
+      padding-bottom:env(safe-area-inset-bottom);
+      background:rgba(255,255,255,.97);
+      border-top:1px solid var(--line);
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      z-index:50;
+      box-shadow:0 -6px 18px rgba(0,0,0,.06);
+    }
+
+    .nav-item {
+      min-height:68px;
+      border:none;
+      background:transparent;
+      color:var(--sub);
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      gap:2px;
+      padding-top:6px;
+    }
+
+    .nav-item span {
+      display:grid;
+      place-items:center;
+      width:36px;
+      height:30px;
+      border-radius:999px;
+      font-size:20px;
+    }
+
+    .nav-item.active { color:var(--main); }
+    .nav-item.active span { background:var(--main-soft); }
+
+    .toast {
+      position:fixed;
+      left:14px;
+      right:14px;
+      bottom:calc(86px + env(safe-area-inset-bottom));
+      max-width:492px;
+      margin:0 auto;
+      background:rgba(45,49,55,.94);
+      color:white;
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:800;
+      z-index:100;
+      opacity:0;
+      transform:translateY(8px);
+      pointer-events:none;
+      transition:.18s ease;
+    }
+
+    .toast.show { opacity:1; transform:none; }
+
+    @media (max-width:370px) {
+      main { padding:12px; }
+      .jump-tabs button { font-size:12px; }
+      .tool-grid { grid-template-columns:1fr; }
+      .subject { font-size:15px; }
+      .tabs { gap:6px; }
+      .tab { min-height:44px; }
+      .nav-item { font-size:11px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="header-main">
+        <button class="icon-btn" onclick="showHelp()" aria-label="操作説明">？</button>
+        <div>
+          <h1>School Planner</h1>
+          <div class="date" id="todayText"></div>
+        </div>
+        <button class="icon-btn" onclick="scrollToBlock('add')" aria-label="ToDo追加">＋</button>
+      </div>
+
+      <div class="jump-tabs">
+        <button id="jump-schedule" class="active" onclick="scrollToBlock('schedule')">予定</button>
+        <button id="jump-todo" onclick="scrollToBlock('todo')">ToDo</button>
+        <button id="jump-add" onclick="scrollToBlock('add')">追加</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="scheduleBlock" class="block">
+        <div class="block-title">
+          <h2>曜日別スケジュール</h2>
+          <span>今日の曜日を自動選択</span>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span id="scheduleTitle">曜日別スケジュール</span>
+            <span class="teacher">曜日を押して切替</span>
+          </div>
+          <div class="tabs" id="weekdayTabs"></div>
+          <div id="weekdayTimetable"></div>
+        </div>
+      </section>
+
+      <section id="todoBlock" class="block">
+        <div class="block-title">
+          <h2>ToDoリスト</h2>
+          <span>未完了優先・日付順</span>
+        </div>
+
+        <div class="card">
+          <div class="segmented">
+            <button id="filter-all" class="active" onclick="setTodoFilter('all')">すべて</button>
+            <button id="filter-open" onclick="setTodoFilter('open')">未完了</button>
+            <button id="filter-done" onclick="setTodoFilter('done')">完了済み</button>
+          </div>
+          <div id="todoList"></div>
+        </div>
+      </section>
+
+      <section id="addBlock" class="block">
+        <div class="block-title">
+          <h2>ToDo追加</h2>
+          <span>1件ずつ入力</span>
+        </div>
+
+        <div class="card">
+          <div class="notice" style="margin-bottom:12px;">
+            宿題・提出物・小テストなどを、必要な分だけ個別に入力してください。
+          </div>
+
+          <form class="form-grid" id="todoForm">
+            <label>タイトル
+              <input id="todoTitleInput" type="text" placeholder="内容を入力" required />
+            </label>
+            <label>教科
+              <select id="todoSubjectInput">
+                <option>英語</option><option>数学</option><option>国語</option>
+                <option>物理</option><option>化学</option><option>地歴</option>
+                <option>体育</option><option>その他</option>
+              </select>
+            </label>
+            <label>期限
+              <input id="todoDueInput" type="date" required />
+            </label>
+            <label>種別
+              <select id="todoTypeInput">
+                <option>宿題</option><option>提出物</option><option>小テスト</option>
+                <option>試験勉強</option><option>持ち物</option><option>その他</option>
+              </select>
+            </label>
+            <label>重要度
+              <select id="todoPriorityInput">
+                <option value="高">高</option><option value="中" selected>中</option><option value="低">低</option>
+              </select>
+            </label>
+            <label>メモ
+              <textarea id="todoMemoInput" placeholder="任意"></textarea>
+            </label>
+            <button class="primary-btn" type="submit">追加する</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="settingsBlock" class="block">
+        <div class="block-title">
+          <h2>設定</h2>
+          <span>補助機能</span>
+        </div>
+
+        <div class="card">
+          <div class="card-title">今週のカレンダー <span class="teacher">● = 期限あり</span></div>
+          <div class="week-calendar" id="weekCalendar"></div>
+        </div>
+
+        <div class="tool-grid">
+          <button class="tool-card" onclick="exportData()">
+            <div class="tool-icon">📤</div>
+            <div class="tool-title">データ書き出し</div>
+            <div class="tool-desc">JSONとして保存</div>
+          </button>
+
+          <button class="tool-card" onclick="resetTodos()">
+            <div class="tool-icon">↺</div>
+            <div class="tool-title">ToDo全削除</div>
+            <div class="tool-desc">登録内容を消去</div>
+          </button>
+
+          <button class="tool-card" onclick="showHelp()">
+            <div class="tool-icon">？</div>
+            <div class="tool-title">操作説明</div>
+            <div class="tool-desc">使い方を表示</div>
+          </button>
+
+          <button class="tool-card" onclick="showInstallGuide()">
+            <div class="tool-icon">📱</div>
+            <div class="tool-title">スマホ追加</div>
+            <div class="tool-desc">ホーム画面に追加</div>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" id="nav-schedule" onclick="scrollToBlock('schedule')"><span>▦</span>予定</button>
+      <button class="nav-item" id="nav-todo" onclick="scrollToBlock('todo')"><span>☑</span>ToDo</button>
+      <button class="nav-item" id="nav-add" onclick="scrollToBlock('add')"><span>＋</span>追加</button>
+    </nav>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    const weekdays = [
+      { key:"sunday", label:"日" },
+      { key:"monday", label:"月" },
+      { key:"tuesday", label:"火" },
+      { key:"wednesday", label:"水" },
+      { key:"thursday", label:"木" },
+      { key:"friday", label:"金" },
+      { key:"saturday", label:"土" }
+    ];
+
+    const schoolDays = [
+      { key:"monday", label:"月" },
+      { key:"tuesday", label:"火" },
+      { key:"wednesday", label:"水" },
+      { key:"thursday", label:"木" },
+      { key:"friday", label:"金" },
+      { key:"saturday", label:"土" }
+    ];
+
+    const timetable = {
+      monday: [
+        { period:1, subject:"漢文", teacher:"神保", room:"" },
+        { period:2, subject:"現代文", teacher:"山藤", room:"" },
+        { period:3, subject:"数Ⅲ", teacher:"望月", room:"" },
+        { period:4, subject:"物理", teacher:"永江", room:"" },
+        { period:5, subject:"理地歴", teacher:"石 / 沖 / 川", room:"D / F / 中" },
+        { period:6, subject:"英語Ⅱ", teacher:"川崎", room:"" }
+      ],
+      tuesday: [
+        { period:1, subject:"体育Y", teacher:"吉田薫", room:"" },
+        { period:2, subject:"物理", teacher:"永江", room:"" },
+        { period:3, subject:"理地歴", teacher:"石 / 沖 / 川", room:"D / F / 中" },
+        { period:4, subject:"数演習", teacher:"小宮", room:"" },
+        { period:5, subject:"古文", teacher:"野谷", room:"" },
+        { period:6, subject:"理理数探", teacher:"名 / 北 / 出 / 小", room:"" }
+      ],
+      wednesday: [
+        { period:1, subject:"数C", teacher:"藤倉", room:"" },
+        { period:2, subject:"現 / 古", teacher:"山藤 / 野谷", room:"" },
+        { period:3, subject:"理地歴", teacher:"石 / 沖 / 川", room:"D / F / 中" },
+        { period:4, subject:"化学", teacher:"淡野", room:"" },
+        { period:5, subject:"英語Ⅲ", teacher:"ウスリー", room:"" },
+        { period:6, subject:"英Ⅰ / Ⅱ", teacher:"脇濱 / 川崎", room:"" }
+      ],
+      thursday: [
+        { period:1, subject:"数C", teacher:"藤倉", room:"" },
+        { period:2, subject:"数Ⅲ", teacher:"望月", room:"" },
+        { period:3, subject:"物理", teacher:"永江", room:"" },
+        { period:4, subject:"体育Y", teacher:"吉田薫", room:"" },
+        { period:5, subject:"化学", teacher:"淡野", room:"" },
+        { period:6, subject:"英語Ⅰ", teacher:"脇濱", room:"" }
+      ],
+      friday: [
+        { period:1, subject:"古文", teacher:"野谷", room:"" },
+        { period:2, subject:"数Ⅲ", teacher:"望月", room:"" },
+        { period:3, subject:"英語Ⅲ", teacher:"ウスリー", room:"" },
+        { period:4, subject:"英語Ⅱ", teacher:"川崎", room:"" },
+        { period:5, subject:"現代文", teacher:"山藤", room:"" },
+        { period:6, subject:"体育Y", teacher:"吉田薫", room:"" }
+      ],
+      saturday: [
+        { period:1, subject:"漢文", teacher:"神保", room:"" },
+        { period:2, subject:"英語Ⅰ", teacher:"脇濱", room:"" },
+        { period:3, subject:"化学", teacher:"淡野", room:"" },
+        { period:4, subject:"数演習", teacher:"小宮", room:"" }
+      ],
+      sunday: []
+    };
+
+    let todos = JSON.parse(localStorage.getItem("schoolPlannerTodosStable") || "[]");
+    let selectedDayKey = getTodayKey();
+    let todoFilter = "all";
+
+    function getTodayKey() {
+      return weekdays[new Date().getDay()].key;
+    }
+
+    function getDateString(offset = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    }
+
+    function getId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return "todo_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    }
+
+    function formatDateJa(dateString) {
+      const d = new Date(dateString + "T00:00:00");
+      return `${d.getMonth()+1}/${d.getDate()}`;
+    }
+
+    function saveTodos() {
+      localStorage.setItem("schoolPlannerTodosStable", JSON.stringify(todos));
+    }
+
+    function renderDate() {
+      const d = new Date();
+      document.getElementById("todayText").textContent =
+        `${d.getMonth()+1}月${d.getDate()}日（${weekdays[d.getDay()].label}）`;
+    }
+
+    function renderWeekdayTabs() {
+      document.getElementById("weekdayTabs").innerHTML = schoolDays.map(day => `
+        <button class="tab ${day.key === selectedDayKey ? "active" : ""}" onclick="selectDay('${day.key}')">${day.label}</button>
+      `).join("");
+    }
+
+    function selectDay(dayKey) {
+      selectedDayKey = dayKey;
+      renderWeekdayTabs();
+      const label = schoolDays.find(d => d.key === dayKey)?.label || "";
+      document.getElementById("scheduleTitle").textContent = `${label}曜日のスケジュール`;
+      renderTimetable(dayKey);
+    }
+
+    function renderTimetable(dayKey) {
+      const container = document.getElementById("weekdayTimetable");
+      const lessons = timetable[dayKey] || [];
+      if (lessons.length === 0) {
+        container.innerHTML = `<div class="empty">授業なし</div>`;
+        return;
+      }
+      container.innerHTML = lessons.map(item => `
+        <div class="lesson">
+          <div class="period">${item.period}限</div>
+          <div>
+            <div class="subject">${item.subject}</div>
+            <div class="teacher">${item.teacher || ""}</div>
+            ${item.room ? `<div class="room">${item.room}</div>` : ""}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function priorityClass(priority) {
+      if (priority === "高") return "high";
+      if (priority === "中") return "mid";
+      return "low";
+    }
+
+    function visibleTodos() {
+      let list = [...todos];
+
+      if (todoFilter === "open") list = list.filter(t => !t.completed);
+      if (todoFilter === "done") list = list.filter(t => t.completed);
+
+      const priorityRank = { "高":0, "中":1, "低":2 };
+
+      list.sort((a,b) => {
+        if (todoFilter !== "done" && a.completed !== b.completed) {
+          return a.completed ? 1 : -1;
+        }
+        const due = a.due.localeCompare(b.due);
+        if (due !== 0) return due;
+        return (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9);
+      });
+
+      return list;
+    }
+
+    function renderTodos() {
+      const list = visibleTodos();
+      const container = document.getElementById("todoList");
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="empty">ToDoはまだありません。追加タブから個別に入力してください。</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(todo => `
+        <div class="todo ${todo.completed ? "done" : ""}" onclick="toggleTodo('${todo.id}')">
+          <input type="checkbox" ${todo.completed ? "checked" : ""} aria-label="完了切り替え" />
+          <div>
+            <div class="todo-title">${escapeHtml(todo.title)}</div>
+            <div class="todo-sub">${escapeHtml(todo.subject)} / ${formatDateJa(todo.due)}まで</div>
+            <div class="badges">
+              <span class="badge type">${escapeHtml(todo.type)}</span>
+              <span class="badge ${priorityClass(todo.priority)}">${escapeHtml(todo.priority)}</span>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleTodo(id) {
+      todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+      saveTodos();
+      renderTodos();
+      renderWeekCalendar();
+      showToast("ToDoを更新しました");
+    }
+
+    function setTodoFilter(filter) {
+      todoFilter = filter;
+      ["all","open","done"].forEach(f => {
+        document.getElementById("filter-" + f).classList.toggle("active", f === filter);
+      });
+      renderTodos();
+    }
+
+    document.getElementById("todoForm").addEventListener("submit", e => {
+      e.preventDefault();
+
+      const title = document.getElementById("todoTitleInput").value.trim();
+      if (!title) return;
+
+      todos.push({
+        id:getId(),
+        title,
+        subject:document.getElementById("todoSubjectInput").value,
+        due:document.getElementById("todoDueInput").value,
+        type:document.getElementById("todoTypeInput").value,
+        priority:document.getElementById("todoPriorityInput").value,
+        memo:document.getElementById("todoMemoInput").value.trim(),
+        completed:false
+      });
+
+      saveTodos();
+      e.target.reset();
+      document.getElementById("todoDueInput").value = getDateString(0);
+      document.getElementById("todoPriorityInput").value = "中";
+      renderTodos();
+      renderWeekCalendar();
+      scrollToBlock("todo");
+      showToast("ToDoを追加しました");
+    });
+
+    function renderWeekCalendar() {
+      const container = document.getElementById("weekCalendar");
+      const today = new Date();
+      const day = today.getDay();
+      const mondayOffset = day === 0 ? -6 : 1 - day;
+      const days = [];
+
+      for (let i=0; i<7; i++) {
+        const d = new Date();
+        d.setDate(today.getDate() + mondayOffset + i);
+        const dateString = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+        const count = todos.filter(t => !t.completed && t.due === dateString).length;
+        const isToday = d.toDateString() === today.toDateString();
+
+        days.push(`
+          <div class="day ${isToday ? "today" : ""}">
+            <div>${["月","火","水","木","金","土","日"][i]}</div>
+            <div style="font-size:16px;font-weight:850;">${d.getDate()}</div>
+            <div class="dotline">${count ? "●".repeat(Math.min(count,3)) : ""}</div>
+          </div>
+        `);
+      }
+
+      container.innerHTML = days.join("");
+    }
+
+    function scrollToBlock(name) {
+      const map = {
+        schedule:"scheduleBlock",
+        todo:"todoBlock",
+        add:"addBlock"
+      };
+      document.getElementById(map[name]).scrollIntoView({ behavior:"smooth", block:"start" });
+      setActiveNav(name);
+    }
+
+    function setActiveNav(name) {
+      ["schedule","todo","add"].forEach(key => {
+        document.getElementById("nav-" + key).classList.toggle("active", key === name);
+        document.getElementById("jump-" + key).classList.toggle("active", key === name);
+      });
+    }
+
+    function initScrollSpy() {
+      const blocks = [
+        { name:"schedule", el:document.getElementById("scheduleBlock") },
+        { name:"todo", el:document.getElementById("todoBlock") },
+        { name:"add", el:document.getElementById("addBlock") }
+      ];
+      window.addEventListener("scroll", () => {
+        let current = "schedule";
+        for (const b of blocks) {
+          if (b.el.getBoundingClientRect().top < 190) current = b.name;
+        }
+        setActiveNav(current);
+      }, { passive:true });
+    }
+
+    function exportData() {
+      const data = { timetable, todos };
+      const blob = new Blob([JSON.stringify(data,null,2)], { type:"application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "school-planner-data.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("データを書き出しました");
+    }
+
+    function resetTodos() {
+      if (!confirm("登録済みToDoをすべて削除しますか？")) return;
+      todos = [];
+      saveTodos();
+      renderTodos();
+      renderWeekCalendar();
+      showToast("ToDoを全削除しました");
+    }
+
+    function showHelp() {
+      alert("操作説明\\n\\n1. 一番上は曜日別スケジュールです。今日の曜日が自動選択されます。\\n2. ToDoは未完了を先、完了済みを後にして日付順で表示します。\\n3. ToDoカード全体を押すと完了/未完了を切り替えます。\\n4. ToDoは追加タブから1件ずつ入力します。");
+    }
+
+    function showInstallGuide() {
+      alert("スマホで使う方法\\n\\niPhone: Safariで開く → 共有 → ホーム画面に追加\\nAndroid: Chromeで開く → ︙ → ホーム画面に追加");
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, c => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[c]));
+    }
+
+    function init() {
+      document.getElementById("todoDueInput").value = getDateString(0);
+      renderDate();
+      renderWeekdayTabs();
+      selectDay(selectedDayKey === "sunday" ? "monday" : selectedDayKey);
+      renderTodos();
+      renderWeekCalendar();
+      initScrollSpy();
+    }
+
+    init();
+  </script>
+</body>
+</html>
