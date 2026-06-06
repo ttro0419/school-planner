@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>School Planner</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-title" content="School Planner">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FFD54A">
+<style>
+:root{--main:#FFD54A;--soft:#FFF6D2;--bg:#F6F7F9;--card:#fff;--text:#303236;--sub:#747980;--line:#DDE2E8;--red:#E6463A;--green:#2FAE55;--orange:#E98200}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}button,input,select,textarea{font:inherit}.app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:92px}
+header{position:sticky;top:0;z-index:20;background:rgba(246,247,249,.96);backdrop-filter:blur(14px);padding:calc(10px + env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid var(--line)}
+.head{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center}.icon{width:44px;height:44px;border:1px solid var(--line);border-radius:15px;background:#fff;font-size:21px}.title{text-align:center}.title h1{font-size:20px;margin:0}.date{font-size:13px;color:var(--sub);margin-top:2px}
+.topnav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.topnav button{min-height:42px;border:1px solid var(--line);border-radius:15px;background:#fff;font-weight:850}.topnav button.active{background:var(--main)}
+main{padding:14px}.block{scroll-margin-top:132px;margin-bottom:18px}.block-title{display:flex;justify-content:space-between;align-items:flex-end;margin:8px 2px 10px}.block-title h2{font-size:20px;margin:0}.block-title span{font-size:12px;color:var(--sub)}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(30,36,45,.07)}.card-title{font-size:16px;font-weight:850;margin-bottom:10px;display:flex;justify-content:space-between;gap:8px}.note{background:#F9FBFE;border:1px dashed var(--line);border-radius:14px;padding:12px;color:var(--sub);font-size:14px;margin-bottom:12px}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:12px}.tab{min-height:46px;border:1px solid var(--line);border-radius:15px;background:#fff;font-weight:850}.tab.active{background:var(--main)}
+.lesson{display:grid;grid-template-columns:46px 1fr;gap:10px;min-height:62px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}.lesson:last-child{border-bottom:none}.period{width:42px;height:42px;border-radius:14px;background:var(--soft);display:grid;place-items:center;font-size:13px;font-weight:900}.subject{font-size:16px;font-weight:850}.teacher,.room{color:var(--sub);font-size:13px;margin-top:3px}
+.segment{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#E9EDF2;padding:5px;border-radius:16px;margin-bottom:12px}.segment button{min-height:42px;border:0;border-radius:12px;background:transparent;color:var(--sub);font-weight:850}.segment button.active{background:#fff;color:#111}
+.todo{display:grid;grid-template-columns:42px 1fr;gap:10px;min-height:70px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center;cursor:pointer}.todo:last-child{border-bottom:none}.todo.done{opacity:.48}.todo.done .todo-title{text-decoration:line-through}.todo input{width:28px;height:28px;accent-color:var(--main);pointer-events:none}.todo-title{font-size:15.5px;font-weight:850}.todo-sub{color:var(--sub);font-size:13px;margin-top:3px}.badges,.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.badge{min-height:24px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:850}.type{background:var(--soft)}.high{background:#FFE7E4;color:var(--red)}.mid{background:#FFF2DA;color:var(--orange)}.low{background:#E8F8ED;color:var(--green)}
+.small{min-height:34px;padding:0 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;font-weight:850}.danger{color:var(--red);border-color:#FFD2CE;background:#FFF4F2}.restore{color:var(--green);border-color:#CFEED8;background:#F1FBF4}
+form{display:grid;gap:12px}label{display:grid;gap:6px;font-size:13px;font-weight:850}input,select,textarea{width:100%;min-height:50px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff;font-size:16px}textarea{min-height:82px}.primary,.ghost{min-height:52px;width:100%;border-radius:16px;font-weight:850}.primary{border:0;background:var(--main)}.ghost{border:1px solid var(--line);background:#fff}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;text-align:center}.day{min-height:62px;padding:7px 2px;border-radius:14px;background:#FAFAFA;border:1px solid var(--line);font-size:12px}.day.today{background:var(--main);font-weight:850}.dot{margin-top:4px;color:var(--orange);min-height:16px}.tools{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tool{min-height:92px;border-radius:18px;padding:14px;border:1px solid var(--line);background:#fff;text-align:left;box-shadow:0 6px 18px rgba(30,36,45,.07)}.tool-icon{font-size:24px}.tool-title{font-weight:850}.tool-desc,.empty{font-size:14px;color:var(--sub)}
+.bottom{position:fixed;left:0;right:0;bottom:0;max-width:520px;height:calc(76px + env(safe-area-inset-bottom));margin:0 auto;padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.97);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.06);z-index:30}.nav{border:0;background:transparent;color:var(--sub);font-size:12px;font-weight:800}.nav span{display:grid;place-items:center;margin:0 auto 2px;width:36px;height:30px;border-radius:999px;font-size:20px}.nav.active{color:#111}.nav.active span{background:var(--soft)}
+.toast{position:fixed;left:14px;right:14px;bottom:86px;max-width:492px;margin:0 auto;background:rgba(45,49,55,.94);color:white;padding:12px 14px;border-radius:14px;font-weight:800;z-index:100;opacity:0;transform:translateY(8px);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}
+@media(max-width:370px){main{padding:12px}.tools{grid-template-columns:1fr}.topnav button,.nav{font-size:11px}.subject{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="head">
+    <button class="icon" onclick="showHelp()">？</button>
+    <div class="title"><h1>School Planner</h1><div class="date" id="todayText"></div></div>
+    <button class="icon" onclick="scrollToBlock('add')">＋</button>
+  </div>
+  <div class="topnav">
+    <button id="jump-schedule" class="active" onclick="scrollToBlock('schedule')">予定</button>
+    <button id="jump-todo" onclick="scrollToBlock('todo')">ToDo</button>
+    <button id="jump-add" onclick="scrollToBlock('add')">追加</button>
+  </div>
+</header>
+
+<main>
+<section id="scheduleBlock" class="block">
+  <div class="block-title"><h2>曜日別スケジュール</h2><span>今日の曜日を自動選択</span></div>
+  <div class="card">
+    <div class="card-title"><span id="scheduleTitle">曜日別スケジュール</span><span class="teacher">曜日を押して切替</span></div>
+    <div class="tabs" id="weekdayTabs"></div>
+    <div id="weekdayTimetable"></div>
+  </div>
+</section>
+
+<section id="todoBlock" class="block">
+  <div class="block-title"><h2>ToDoリスト</h2><span>未完了優先・日付順</span></div>
+  <div class="card">
+    <div class="segment">
+      <button id="filter-all" class="active" onclick="setTodoFilter('all')">すべて</button>
+      <button id="filter-open" onclick="setTodoFilter('open')">未完了</button>
+      <button id="filter-done" onclick="setTodoFilter('done')">完了済み</button>
+    </div>
+    <div id="todoList"></div>
+  </div>
+</section>
+
+<section id="addBlock" class="block">
+  <div class="block-title"><h2>ToDo追加</h2><span>1件ずつ入力</span></div>
+  <div class="card">
+    <div class="note">宿題・提出物・小テストなどを、必要な分だけ個別に入力してください。</div>
+    <form id="todoForm">
+      <label>タイトル<input id="todoTitleInput" type="text" placeholder="内容を入力" required></label>
+      <label>教科<select id="todoSubjectInput"><option>英語</option><option>数学</option><option>国語</option><option>物理</option><option>化学</option><option>地歴</option><option>体育</option><option>その他</option></select></label>
+      <label>期限<input id="todoDueInput" type="date" required></label>
+      <label>種別<select id="todoTypeInput"><option>宿題</option><option>提出物</option><option>小テスト</option><option>試験勉強</option><option>持ち物</option><option>その他</option></select></label>
+      <label>重要度<select id="todoPriorityInput"><option value="高">高</option><option value="中" selected>中</option><option value="低">低</option></select></label>
+      <label>メモ<textarea id="todoMemoInput" placeholder="任意"></textarea></label>
+      <button class="primary" type="submit">追加する</button>
+    </form>
+  </div>
+</section>
+
+<section id="settingsBlock" class="block">
+  <div class="block-title"><h2>設定</h2><span>補助機能</span></div>
+  <div class="card"><div class="card-title">今週のカレンダー <span class="teacher">● = 期限あり</span></div><div class="week" id="weekCalendar"></div></div>
+  <div class="card"><div class="card-title">ゴミ箱 <span class="teacher">7日後に完全削除</span></div><div id="trashList"></div></div>
+  <div class="tools">
+    <button class="tool" onclick="exportData()"><div class="tool-icon">📤</div><div class="tool-title">データ書き出し</div><div class="tool-desc">JSONとして保存</div></button>
+    <button class="tool" onclick="resetAll()"><div class="tool-icon">↺</div><div class="tool-title">全削除</div><div class="tool-desc">ToDoとゴミ箱を消去</div></button>
+    <button class="tool" onclick="showHelp()"><div class="tool-icon">？</div><div class="tool-title">操作説明</div><div class="tool-desc">使い方を表示</div></button>
+    <button class="tool" onclick="showInstallGuide()"><div class="tool-icon">📱</div><div class="tool-title">スマホ追加</div><div class="tool-desc">ホーム画面に追加</div></button>
+  </div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button class="nav active" id="nav-schedule" onclick="scrollToBlock('schedule')"><span>▦</span>予定</button>
+  <button class="nav" id="nav-todo" onclick="scrollToBlock('todo')"><span>☑</span>ToDo</button>
+  <button class="nav" id="nav-add" onclick="scrollToBlock('add')"><span>＋</span>追加</button>
+</nav>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+const weekdays=[{key:"sunday",label:"日"},{key:"monday",label:"月"},{key:"tuesday",label:"火"},{key:"wednesday",label:"水"},{key:"thursday",label:"木"},{key:"friday",label:"金"},{key:"saturday",label:"土"}];
+const schoolDays=[{key:"monday",label:"月"},{key:"tuesday",label:"火"},{key:"wednesday",label:"水"},{key:"thursday",label:"木"},{key:"friday",label:"金"},{key:"saturday",label:"土"}];
+const timetable={
+monday:[{period:1,subject:"漢文",teacher:"神保",room:""},{period:2,subject:"現代文",teacher:"山藤",room:""},{period:3,subject:"数Ⅲ",teacher:"望月",room:""},{period:4,subject:"物理",teacher:"永江",room:""},{period:5,subject:"理地歴",teacher:"石 / 沖 / 川",room:"D / F / 中"},{period:6,subject:"英語Ⅱ",teacher:"川崎",room:""}],
+tuesday:[{period:1,subject:"体育Y",teacher:"吉田薫",room:""},{period:2,subject:"物理",teacher:"永江",room:""},{period:3,subject:"理地歴",teacher:"石 / 沖 / 川",room:"D / F / 中"},{period:4,subject:"数演習",teacher:"小宮",room:""},{period:5,subject:"古文",teacher:"野谷",room:""},{period:6,subject:"理理数探",teacher:"名 / 北 / 出 / 小",room:""}],
+wednesday:[{period:1,subject:"数C",teacher:"藤倉",room:""},{period:2,subject:"現 / 古",teacher:"山藤 / 野谷",room:""},{period:3,subject:"理地歴",teacher:"石 / 沖 / 川",room:"D / F / 中"},{period:4,subject:"化学",teacher:"淡野",room:""},{period:5,subject:"英語Ⅲ",teacher:"ウスリー",room:""},{period:6,subject:"英Ⅰ / Ⅱ",teacher:"脇濱 / 川崎",room:""}],
+thursday:[{period:1,subject:"数C",teacher:"藤倉",room:""},{period:2,subject:"数Ⅲ",teacher:"望月",room:""},{period:3,subject:"物理",teacher:"永江",room:""},{period:4,subject:"体育Y",teacher:"吉田薫",room:""},{period:5,subject:"化学",teacher:"淡野",room:""},{period:6,subject:"英語Ⅰ",teacher:"脇濱",room:""}],
+friday:[{period:1,subject:"古文",teacher:"野谷",room:""},{period:2,subject:"数Ⅲ",teacher:"望月",room:""},{period:3,subject:"英語Ⅲ",teacher:"ウスリー",room:""},{period:4,subject:"英語Ⅱ",teacher:"川崎",room:""},{period:5,subject:"現代文",teacher:"山藤",room:""},{period:6,subject:"体育Y",teacher:"吉田薫",room:""}],
+saturday:[{period:1,subject:"漢文",teacher:"神保",room:""},{period:2,subject:"英語Ⅰ",teacher:"脇濱",room:""},{period:3,subject:"化学",teacher:"淡野",room:""},{period:4,subject:"数演習",teacher:"小宮",room:""}],
+sunday:[]};
+
+const TODO_KEY="schoolPlannerTodosTrashV1",TRASH_KEY="schoolPlannerTrashV1";
+let todos=JSON.parse(localStorage.getItem(TODO_KEY)||"[]");
+let trash=JSON.parse(localStorage.getItem(TRASH_KEY)||"[]");
+let selectedDayKey=getTodayKey(),todoFilter="all";
+
+function getTodayKey(){return weekdays[new Date().getDay()].key}
+function getDateString(offset=0){const d=new Date();d.setDate(d.getDate()+offset);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function dayStartMs(s){return new Date(s+"T00:00:00").getTime()}
+function getId(){return crypto?.randomUUID?crypto.randomUUID():"todo_"+Date.now()+"_"+Math.random().toString(36).slice(2)}
+function formatDateJa(s){const d=new Date(s+"T00:00:00");return `${d.getMonth()+1}/${d.getDate()}`}
+function save(){localStorage.setItem(TODO_KEY,JSON.stringify(todos));localStorage.setItem(TRASH_KEY,JSON.stringify(trash))}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+function maintenance(){
+  const today=dayStartMs(getDateString(0)), now=Date.now(), week=7*24*60*60*1000, keep=[];
+  for(const t of todos){
+    if(t.completed&&t.completedAt&&new Date(t.completedAt).setHours(0,0,0,0)<today){
+      trash.push({...t,deletedAt:new Date().toISOString(),deletedReason:"auto"});
+    }else keep.push(t);
+  }
+  todos=keep;
+  trash=trash.filter(t=>!t.deletedAt||now-new Date(t.deletedAt).getTime()<week);
+  save();
+}
+
+function renderDate(){const d=new Date();todayText.textContent=`${d.getMonth()+1}月${d.getDate()}日（${weekdays[d.getDay()].label}）`}
+function renderWeekdayTabs(){weekdayTabs.innerHTML=schoolDays.map(d=>`<button class="tab ${d.key===selectedDayKey?"active":""}" onclick="selectDay('${d.key}')">${d.label}</button>`).join("")}
+function selectDay(k){selectedDayKey=k;renderWeekdayTabs();const l=schoolDays.find(d=>d.key===k)?.label||"";scheduleTitle.textContent=`${l}曜日のスケジュール`;renderTimetable(k)}
+function renderTimetable(k){const a=timetable[k]||[];weekdayTimetable.innerHTML=a.length?a.map(x=>`<div class="lesson"><div class="period">${x.period}限</div><div><div class="subject">${x.subject}</div><div class="teacher">${x.teacher||""}</div>${x.room?`<div class="room">${x.room}</div>`:""}</div></div>`).join(""):`<div class="empty">授業なし</div>`}
+
+function priorityClass(p){return p==="高"?"high":p==="中"?"mid":"low"}
+function visibleTodos(){
+  let list=[...todos];
+  if(todoFilter==="open")list=list.filter(t=>!t.completed);
+  if(todoFilter==="done")list=list.filter(t=>t.completed);
+  const r={高:0,中:1,低:2};
+  list.sort((a,b)=>todoFilter!=="done"&&a.completed!==b.completed?(a.completed?1:-1):a.due.localeCompare(b.due)||((r[a.priority]??9)-(r[b.priority]??9)));
+  return list;
+}
+function renderTodos(){
+  const list=visibleTodos();
+  todoList.innerHTML=list.length?list.map(t=>`<div class="todo ${t.completed?"done":""}" onclick="toggleTodo('${t.id}')"><input type="checkbox" ${t.completed?"checked":""}><div><div class="todo-title">${esc(t.title)}</div><div class="todo-sub">${esc(t.subject)} / ${formatDateJa(t.due)}まで</div><div class="badges"><span class="badge type">${esc(t.type)}</span><span class="badge ${priorityClass(t.priority)}">${esc(t.priority)}</span></div><div class="actions"><button class="small danger" onclick="event.stopPropagation();deleteTodo('${t.id}')">削除</button></div></div></div>`).join(""):`<div class="empty">ToDoはまだありません。追加タブから個別に入力してください。</div>`;
+}
+function toggleTodo(id){todos=todos.map(t=>t.id===id?{...t,completed:!t.completed,completedAt:!t.completed?new Date().toISOString():null}:t);save();renderAll();toast("ToDoを更新しました")}
+function deleteTodo(id){const t=todos.find(x=>x.id===id);if(!t)return;todos=todos.filter(x=>x.id!==id);trash.push({...t,deletedAt:new Date().toISOString(),deletedReason:"manual"});save();renderAll();toast("ゴミ箱へ移動しました")}
+function restoreTodo(id){const t=trash.find(x=>x.id===id);if(!t)return;trash=trash.filter(x=>x.id!==id);const{deletedAt,deletedReason,...rest}=t;todos.push({...rest,completed:false,completedAt:null});save();renderAll();toast("復元しました")}
+function purgeTrashItem(id){if(!confirm("完全削除しますか？"))return;trash=trash.filter(x=>x.id!==id);save();renderTrash();toast("完全削除しました")}
+function setTodoFilter(f){todoFilter=f;["all","open","done"].forEach(x=>document.getElementById("filter-"+x).classList.toggle("active",x===f));renderTodos()}
+
+todoForm.addEventListener("submit",e=>{e.preventDefault();const title=todoTitleInput.value.trim();if(!title)return;todos.push({id:getId(),title,subject:todoSubjectInput.value,due:todoDueInput.value,type:todoTypeInput.value,priority:todoPriorityInput.value,memo:todoMemoInput.value.trim(),completed:false,completedAt:null});save();e.target.reset();todoDueInput.value=getDateString(0);todoPriorityInput.value="中";renderAll();scrollToBlock("todo");toast("ToDoを追加しました")});
+
+function renderWeekCalendar(){
+  const today=new Date(),day=today.getDay(),mon=day===0?-6:1-day,out=[];
+  for(let i=0;i<7;i++){const d=new Date();d.setDate(today.getDate()+mon+i);const s=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;const c=todos.filter(t=>!t.completed&&t.due===s).length;out.push(`<div class="day ${d.toDateString()===today.toDateString()?"today":""}"><div>${["月","火","水","木","金","土","日"][i]}</div><div style="font-size:16px;font-weight:850">${d.getDate()}</div><div class="dot">${c?"●".repeat(Math.min(c,3)):""}</div></div>`)}
+  weekCalendar.innerHTML=out.join("");
+}
+function renderTrash(){
+  const list=[...trash].sort((a,b)=>new Date(b.deletedAt||0)-new Date(a.deletedAt||0));
+  trashList.innerHTML=list.length?list.map(t=>{const left=Math.max(0,7-Math.floor((Date.now()-new Date(t.deletedAt).getTime())/(24*60*60*1000)));return `<div class="todo done"><input type="checkbox" checked><div><div class="todo-title">${esc(t.title)}</div><div class="todo-sub">${esc(t.subject)} / ${formatDateJa(t.due)}まで / 残り約${left}日</div><div class="badges"><span class="badge type">${t.deletedReason==="manual"?"手動削除":"自動削除"}</span><span class="badge ${priorityClass(t.priority)}">${esc(t.priority)}</span></div><div class="actions"><button class="small restore" onclick="restoreTodo('${t.id}')">復元</button><button class="small danger" onclick="purgeTrashItem('${t.id}')">完全削除</button></div></div></div>`}).join(""):`<div class="empty">ゴミ箱は空です。</div>`;
+}
+function scrollToBlock(n){const id={schedule:"scheduleBlock",todo:"todoBlock",add:"addBlock"}[n];document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});setActiveNav(n)}
+function setActiveNav(n){["schedule","todo","add"].forEach(k=>{document.getElementById("nav-"+k).classList.toggle("active",k===n);document.getElementById("jump-"+k).classList.toggle("active",k===n)})}
+function initSpy(){const b=[["schedule",scheduleBlock],["todo",todoBlock],["add",addBlock]];addEventListener("scroll",()=>{let c="schedule";for(const x of b)if(x[1].getBoundingClientRect().top<190)c=x[0];setActiveNav(c)},{passive:true})}
+function exportData(){const blob=new Blob([JSON.stringify({timetable,todos,trash},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="school-planner-data.json";a.click();URL.revokeObjectURL(url);toast("データを書き出しました")}
+function resetAll(){if(!confirm("ToDoとゴミ箱をすべて削除しますか？"))return;todos=[];trash=[];save();renderAll();toast("全削除しました")}
+function showHelp(){alert("操作説明\n\n・完了したToDoは、翌日以降に自動でゴミ箱へ移動します。\n・ゴミ箱内のToDoは7日後に完全削除されます。\n・間違って作ったToDoは「削除」でゴミ箱へ移動できます。\n・ゴミ箱からは7日以内なら復元できます。\n・未完了のToDoは期限切れでも自動削除されません。")}
+function showInstallGuide(){alert("スマホで使う方法\n\niPhone: Safariで開く → 共有 → ホーム画面に追加\nAndroid: Chromeで開く → ︙ → ホーム画面に追加")}
+function toast(t){toastEl=toast;const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove("show"),1600)}
+function renderAll(){renderTodos();renderWeekCalendar();renderTrash()}
+function init(){maintenance();todoDueInput.value=getDateString(0);renderDate();renderWeekdayTabs();selectDay(selectedDayKey==="sunday"?"monday":selectedDayKey);renderAll();initSpy()}
+init();
+</script>
+</body>
+</html>
